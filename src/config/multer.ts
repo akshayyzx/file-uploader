@@ -1,19 +1,17 @@
 import multer from "multer";
-import path from "path";
 
-const storage = multer.diskStorage({
-    destination: (_, __, cb) => {
-        cb(null, "uploads/");
-    },
-    filename: (req,file, cb) => {
-     const uploadId = req.params.uploadId;
-     const chunkNumber = req.query.chunkNumber;
+const storage =
+  multer.memoryStorage();
 
-     cb(
-        null,
-        `${uploadId}-${chunkNumber}`
-     )
-  }
+const maxChunkSize =
+  Number(
+    process.env
+      .MAX_UPLOAD_CHUNK_SIZE
+  ) || 25 * 1024 * 1024;
+
+export const upload = multer({
+  storage,
+  limits: {
+    fileSize: maxChunkSize,
+  },
 });
-
-export const upload = multer({storage});
