@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { v4 as uuidv4 } from "uuid";
+import { randomUUID } from "crypto";
 import {
   completeMultipartUpload,
   createMultipartUpload,
@@ -11,74 +11,45 @@ import {
 }
 from "../services/presigned-url.service";
 
-export const initializeUpload =
-  async (
-    req: Request,
-    res: Response
-  ) => {
-    try {
+export const initializeUpload = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { fileName, fileSize, totalChunks } = req.body;
 
-      const {
-        fileName,
-        fileSize,
-        totalChunks,
-      } = req.body;
-
-      if (
-        !fileName ||
-        !fileSize ||
-        !totalChunks
-      ) {
-        return res.status(400).json({
-          success: false,
-          message:
-            "Missing fields",
-        });
-      }
-
-      const uploadId =
-        uuidv4();
-
-      const s3Response =
-        await createMultipartUpload(
-          fileName
-        );
-
-      const upload =
-        await Upload.create({
-          uploadId,
-
-          fileName,
-
-          fileSize,
-
-          totalChunks,
-
-          s3UploadId:
-            s3Response.UploadId,
-
-          uploadedParts: [],
-        });
-
-      return res.status(201).json({
-        success: true,
-
-        uploadId,
-
-        s3UploadId:
-          s3Response.UploadId,
-      });
-
-    } catch (error) {
-
-      console.error(error);
-
-      return res.status(500).json({
+    if (!fileName || !fileSize || !totalChunks) {
+      return res.status(400).json({
         success: false,
+        message: "Missing fields",
       });
-
     }
-  };
+
+    const uploadId = randomUUID();
+
+    const s3Response = await createMultipartUpload(fileName);
+
+    const upload = await Upload.create({
+      uploadId,
+      fileName,
+      fileSize,
+      totalChunks,
+      s3UploadId: s3Response.UploadId,
+      uploadedParts: [],
+    });
+
+    return res.status(201).json({
+      success: true,
+      uploadId,
+      s3UploadId: s3Response.UploadId,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+    });
+  }
+};
 
 export const getUploadStatus = async (
   req: Request,
