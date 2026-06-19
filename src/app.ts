@@ -17,7 +17,7 @@ app.get('/', (req, res) => {
 });
 
 app.use(
-  "/api/upload",
+  "/upload",
   uploadRoutes
 );
 
