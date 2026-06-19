@@ -6,8 +6,10 @@ import { uploadToS3 } from "./services/s3.service";
 const app = express();
 
 // Middleware
-app.use(cors());
-app.use(express.json());
+app.use(cors({
+  origin: 'https://file-storage-frontend-jade.vercel.app',
+  credentials: true,
+}));app.use(express.json());
 
 // Routes
 app.get('/', (req, res) => {
