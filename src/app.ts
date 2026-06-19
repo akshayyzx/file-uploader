@@ -7,7 +7,8 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: 'https://file-storage-frontend-jade.vercel.app',
+  origin: ['https://file-storage-frontend-jade.vercel.app',
+    "https://file-storage-frontend-pm034yphg-akshay-singh-patels-projects.vercel.app/"],
   credentials: true,
 }));app.use(express.json());
 
